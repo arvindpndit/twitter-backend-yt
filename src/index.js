@@ -1,14 +1,64 @@
 const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(express.json());
 const PORT = 3000;
 
 const prisma = new PrismaClient();
+const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 //app.METHOD(PATH, HANDLER)
+
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        username: username,
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User doesn't exist, Please Sign up first",
+        data: {},
+        error: {},
+      });
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Incorrect password",
+        data: {},
+        error: {},
+        k,
+      });
+    }
+
+    const token = jwt.sign({ username: user.username }, JWT_TOKEN_SECRET);
+    return res.status(500).json({
+      success: true,
+      message: "Logged in",
+      data: { token },
+      error: {},
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: true,
+      message: "Something went wrong",
+      data: {},
+      error: error,
+    });
+  }
+});
 
 app.post("/signup", async (req, res) => {
   const { username, password, firstName } = req.body;
