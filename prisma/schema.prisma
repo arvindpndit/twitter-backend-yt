@@ -21,4 +21,14 @@ model User {
   lastName  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
+  tweets    Tweet[]
+}
+
+model Tweet {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  String
 }
