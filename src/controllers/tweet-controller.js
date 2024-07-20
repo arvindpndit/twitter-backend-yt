@@ -1,14 +1,12 @@
-const { PrismaClient } = require('@prisma/client');
-
-const prisma = new PrismaClient();
+const prisma = require('../config/prisma-client.js');
 
 const create = async (req, res) => {
-  const { content, authorId } = req.body;
+  const { content } = req.body;
   try {
     const tweet = await prisma.tweet.create({
       data: {
         content,
-        authorId,
+        authorId: req.user.id,
       },
     });
 

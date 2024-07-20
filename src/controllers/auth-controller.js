@@ -1,8 +1,7 @@
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const prisma = require('../config/prisma-client.js');
 
-const prisma = new PrismaClient();
 const JWT_TOKEN_SECRET = process.env.JWT_TOKEN_SECRET;
 
 //app.METHOD(PATH, HANDLER)
@@ -31,24 +30,27 @@ const login = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({
         success: false,
-        message: "Incorrect password",
+        message: 'Incorrect password',
         data: {},
         error: {},
         k,
       });
     }
 
-    const token = jwt.sign({ username: user.username }, JWT_TOKEN_SECRET);
+    const token = jwt.sign(
+      { username: user.username, id: user.id },
+      JWT_TOKEN_SECRET,
+    );
     return res.status(500).json({
       success: true,
-      message: "Logged in",
+      message: 'Logged in',
       data: { token },
       error: {},
     });
   } catch (error) {
     return res.status(500).json({
       success: true,
-      message: "Something went wrong",
+      message: 'Something went wrong',
       data: {},
       error: error,
     });
@@ -68,14 +70,14 @@ const signup = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Succesfully created a new user",
+      message: 'Succesfully created a new user',
       data: user,
       error: {},
     });
   } catch (error) {
     return res.status(500).json({
       success: true,
-      message: "Something went wrong",
+      message: 'Something went wrong',
       data: {},
       error: error,
     });
@@ -86,3 +88,4 @@ module.exports = {
   login,
   signup,
 };
+
